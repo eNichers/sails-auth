@@ -353,11 +353,11 @@ passport.disconnect = function (req, res, next) {
   });
 };
 
-passport.serializeEmployee(function (employee, next) {
+passport.serializeUser(function (employee, next) {
   next(null, employee.id);
 });
 
-passport.deserializeEmployee(function (id, next) {
+passport.deserializeUser(function (id, next) {
   sails.models.employee.findOne(id)
     .then(function (employee) {
       next(null, employee || null);
