@@ -2,10 +2,10 @@ var _ = require('lodash');
 var crypto = require('crypto');
 var Promise = require("bluebird");
 
-/** @module User */
+/** @module Employee */
 module.exports = {
   attributes: {
-    username: {
+    employeeName: {
       type: 'string',
       unique: true,
       index: true,
@@ -19,7 +19,7 @@ module.exports = {
     },
     passports: {
       collection: 'Passport',
-      via: 'user'
+      via: 'employee'
     },
 
     getGravatarUrl: function () {
@@ -29,26 +29,26 @@ module.exports = {
     },
 
     toJSON: function () {
-      var user = this.toObject();
-      delete user.password;
-      user.gravatarUrl = this.getGravatarUrl();
-      return user;
+      var employee = this.toObject();
+      delete employee.password;
+      employee.gravatarUrl = this.getGravatarUrl();
+      return employee;
     }
   },
 
-  beforeCreate: function (user, next) {
-    if (_.isEmpty(user.username)) {
-      user.username = user.email;
+  beforeCreate: function (employee, next) {
+    if (_.isEmpty(employee.employeeName)) {
+      employee.employeeName = employee.email;
     }
     next();
   },
 
   /**
-   * Register a new User with a passport
+   * Register a new Employee with a passport
    */
-  register: function (user) {
+  register: function (employee) {
     return new Promise(function (resolve, reject) {
-      sails.services.passport.protocols.local.createUser(user, function (error, created) {
+      sails.services.passport.protocols.local.createEmployee(employee, function (error, created) {
         if (error) return reject(error);
 
         resolve(created);

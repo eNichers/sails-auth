@@ -3,13 +3,13 @@ var SAError = require('../../../lib/error/SAError.js');
 /**
  * Local Authentication Protocol
  *
- * The most widely used way for websites to authenticate users is via a username
+ * The most widely used way for websites to authenticate employees is via a employeeName
  * and/or email as well as a password. This module provides functions both for
- * registering entirely new users, assigning passwords to already registered
- * users and validating login requesting.
+ * registering entirely new employees, assigning passwords to already registered
+ * employees and validating login requesting.
  *
  * For more information on local authentication in Passport.js, check out:
- * http://passportjs.org/guide/username-password/
+ * http://passportjs.org/guide/employeeName-password/
  */
 
 /**
@@ -17,26 +17,26 @@ var SAError = require('../../../lib/error/SAError.js');
  * @param {Object}   res
  * @param {Function} next
  */
-exports.register = function (user, next) {
-  exports.createUser(user, next);
+exports.register = function (employee, next) {
+  exports.createEmployee(employee, next);
 };
 
 /**
- * Register a new user
+ * Register a new employee
  *
- * This method creates a new user from a specified email, username and password
- * and assign the newly created user a local Passport.
+ * This method creates a new employee from a specified email, employeeName and password
+ * and assign the newly created employee a local Passport.
  *
- * @param {String}   username
+ * @param {String}   employeeName
  * @param {String}   email
  * @param {String}   password
  * @param {Function} next
  */
-exports.createUser = function (_user, next) {
-  var password = _user.password;
-  delete _user.password;
+exports.createEmployee = function (_employee, next) {
+  var password = _employee.password;
+  delete _employee.password;
 
-  return sails.models.user.create(_user, function (err, user) {
+  return sails.models.employee.create(_employee, function (err, employee) {
     if (err) {
       sails.log(err);
 
@@ -50,28 +50,28 @@ exports.createUser = function (_user, next) {
     sails.models.passport.create({
       protocol : 'local'
     , password : password
-    , user     : user.id
+    , employee     : employee.id
     }, function (err, passport) {
       if (err) {
         if (err.code === 'E_VALIDATION') {
           err = new SAError({originalError: err});
         }
         
-        return user.destroy(function (destroyErr) {
+        return employee.destroy(function (destroyErr) {
           next(destroyErr || err);
         });
       }
 
-      next(null, user);
+      next(null, employee);
     });
   });
 };
 
 /**
- * Assign local Passport to user
+ * Assign local Passport to employee
  *
- * This function can be used to assign a local Passport to a user who doens't
- * have one already. This would be the case if the user registered using a
+ * This function can be used to assign a local Passport to a employee who doens't
+ * have one already. This would be the case if the employee registered using a
  * third-party service and therefore never set a password.
  *
  * @param {Object}   req
@@ -79,13 +79,13 @@ exports.createUser = function (_user, next) {
  * @param {Function} next
  */
 exports.connect = function (req, res, next) {
-  var user     = req.user
+  var employee     = req.employee
     , password = req.param('password')
     , Passport = sails.models.passport;
 
   Passport.findOne({
     protocol : 'local'
-  , user     : user.id
+  , employee     : employee.id
   }, function (err, passport) {
     if (err) {
       return next(err);
@@ -95,13 +95,13 @@ exports.connect = function (req, res, next) {
       Passport.create({
         protocol : 'local'
       , password : password
-      , user     : user.id
+      , employee     : employee.id
       }, function (err, passport) {
-        next(err, user);
+        next(err, employee);
       });
     }
     else {
-      next(null, user);
+      next(null, employee);
     }
   });
 };
@@ -109,8 +109,8 @@ exports.connect = function (req, res, next) {
 /**
  * Validate a login request
  *
- * Looks up a user using the supplied identifier (email or username) and then
- * attempts to find a local Passport associated with the user. If a Passport is
+ * Looks up a employee using the supplied identifier (email or employeeName) and then
+ * attempts to find a local Passport associated with the employee. If a Passport is
  * found, its password is checked against the password supplied in the form.
  *
  * @param {Object}   req
@@ -126,19 +126,19 @@ exports.login = function (req, identifier, password, next) {
     query.email = identifier;
   }
   else {
-    query.username = identifier;
+    query.employeeName = identifier;
   }
 
-  sails.models.user.findOne(query, function (err, user) {
+  sails.models.employee.findOne(query, function (err, employee) {
     if (err) {
       return next(err);
     }
 
-    if (!user) {
+    if (!employee) {
       if (isEmail) {
         req.flash('error', 'Error.Passport.Email.NotFound');
       } else {
-        req.flash('error', 'Error.Passport.Username.NotFound');
+        req.flash('error', 'Error.Passport.employeeName.NotFound');
       }
 
       return next(null, false);
@@ -146,7 +146,7 @@ exports.login = function (req, identifier, password, next) {
 
     sails.models.passport.findOne({
       protocol : 'local'
-    , user     : user.id
+    , employee     : employee.id
     }, function (err, passport) {
       if (passport) {
         passport.validatePassword(password, function (err, res) {
@@ -158,7 +158,7 @@ exports.login = function (req, identifier, password, next) {
             req.flash('error', 'Error.Passport.Password.Wrong');
             return next(null, false);
           } else {
-            return next(null, user, passport);
+            return next(null, employee, passport);
           }
         });
       }

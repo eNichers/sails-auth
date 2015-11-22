@@ -12,7 +12,7 @@ describe('Auth Controller', function () {
         request(sails.hooks.http.app)
             .post('/auth/local')
             .send({
-              identifier: 'existing.user@email.com',
+              identifier: 'existing.employee@email.com',
               password: 'admin1234'
             })
             .expect(200)
@@ -42,7 +42,7 @@ describe('Auth Controller', function () {
         request(sails.hooks.http.app)
             .post('/auth/local')
             .send({
-              identifier: 'existing.user@email.com',
+              identifier: 'existing.employee@email.com',
               password: 'invalid1235'
             })
             .expect(403)
@@ -58,7 +58,7 @@ describe('Auth Controller', function () {
 
       it ('passport-local authentication should succeed if email and password valid', function (done) {
 
-        io.socket.post('/auth/local', { identifier: 'existing.user@email.com', password: 'admin1234' }, function (data, jwres) {
+        io.socket.post('/auth/local', { identifier: 'existing.employee@email.com', password: 'admin1234' }, function (data, jwres) {
 
           assert.equal(jwres.statusCode, 200);
           done();
@@ -81,7 +81,7 @@ describe('Auth Controller', function () {
 
       it ('passport-local authentication should fail and return error code if password is invalid', function (done) {
 
-        io.socket.post('/auth/local', { identifier: 'existing.user@email.com', password: 'invalid1235' }, function (data, jwres) {
+        io.socket.post('/auth/local', { identifier: 'existing.employee@email.com', password: 'invalid1235' }, function (data, jwres) {
 
           assert.equal(jwres.statusCode, 403);
           done();

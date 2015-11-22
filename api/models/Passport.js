@@ -16,7 +16,7 @@ function hashPassword (passport, next) {
       }
       passport.password = hash;
       var t1 = new Date().valueOf();
-      sails.log.silly('hashed password for user in', (t1 - t0), 'ms');
+      sails.log.silly('hashed password for employee in', (t1 - t0), 'ms');
       next(null, passport);
     });
   }
@@ -28,16 +28,16 @@ function hashPassword (passport, next) {
 /**
  * Passport Model
  *
- * The Passport model handles associating authenticators with users. An authen-
+ * The Passport model handles associating authenticators with employees. An authen-
  * ticator can be either local (password) or third-party (provider). A single
- * user can have multiple passports, allowing them to connect and use several
+ * employee can have multiple passports, allowing them to connect and use several
  * third-party strategies in optional conjunction with a password.
  *
- * Since an application will only need to authenticate a user once per session,
+ * Since an application will only need to authenticate a employee once per session,
  * it makes sense to encapsulate the data specific to the authentication process
  * in a model of its own. This allows us to keep the session itself as light-
  * weight as possible as the application only needs to serialize and deserialize
- * the user, but not the authentication data, to and from the session.
+ * the employee, but not the authentication data, to and from the session.
  */
 var Passport = {
   attributes: {
@@ -52,7 +52,7 @@ var Passport = {
     // Local field: Password
     //
     // When the local strategy is employed, a password will be used as the
-    // means of authentication along with either a username or an email.
+    // means of authentication along with either a employeeName or an email.
     password: { type: 'string', minLength: 8 },
 
     // Provider fields: Provider, identifer and tokens
@@ -60,7 +60,7 @@ var Passport = {
     // "provider" is the name of the third-party auth service in all lowercase
     // (e.g. 'github', 'facebook') whereas "identifier" is a provider-specific
     // key, typically an ID. These two fields are used as the main means of
-    // identifying a passport and tying it to a local user.
+    // identifying a passport and tying it to a local employee.
     //
     // The "tokens" field is a JSON object used in the case of the OAuth stan-
     // dards. When using OAuth 1.0, a `token` as well as a `tokenSecret` will
@@ -72,12 +72,12 @@ var Passport = {
 
     // Associations
     //
-    // Associate every passport with one, and only one, user. This requires an
+    // Associate every passport with one, and only one, employee. This requires an
     // adapter compatible with associations.
     //
     // For more information on associations in Waterline, check out:
     // https://github.com/balderdashy/waterline
-    user: { model: 'User', required: true },
+    employee: { model: 'Employee', required: true },
 
     /**
      * Validate password used by the local strategy.

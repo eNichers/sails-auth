@@ -26,7 +26,7 @@ module.exports = {
 
     AuthController: { '*': [ 'passport' ] },
 
-    UserController: { create: true }
+    EmployeeController: { create: true }
 
   }
 

@@ -3,9 +3,9 @@ module.exports = require('sails-generate-entities')({
   id: 'auth-api',
   statics: [
     'api/models/Passport.js',
-    'api/models/User.js',
+    'api/models/Employee.js',
     'api/controllers/AuthController.js',
-    'api/controllers/UserController.js',
+    'api/controllers/EmployeeController.js',
     'api/services/protocols/index.js',
     'config/routes/sails-auth.js',
     'config/passport.js'
