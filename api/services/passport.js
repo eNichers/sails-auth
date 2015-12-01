@@ -287,7 +287,7 @@ passport.loadStrategies = function () {
     if (key === 'local') {
       // Since we need to allow employees to login using both employeeNames as well as
       // emails, we'll set the employeeName field to something more generic.
-      _.extend(options, { employeeNameField: 'identifier' });
+      _.extend(options, { usernameField: 'identifier' });
 
       // Only load the local strategy if it's enabled in the config
       if (strategies.local) {
