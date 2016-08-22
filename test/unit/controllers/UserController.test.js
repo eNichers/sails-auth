@@ -2,7 +2,7 @@ var assert = require('assert');
 var request = require('supertest');
 var _ = require('lodash');
 
-describe('Employee Controller', function () {
+describe('Admin Controller', function () {
 
   before(function (done) {
     request(sails.hooks.http.app)
@@ -18,17 +18,17 @@ describe('Employee Controller', function () {
   });
 
   describe('#me()', function () {
-    it('should return Employee for this authenticated session', function (done) {
+    it('should return Admin for this authenticated session', function (done) {
         var agent = request.agent(sails.hooks.http.app);
 
         agent
-          .get('/employee/me')
+          .get('/admin/me')
           .auth('me@mocha.test', 'admin1234')
           .expect(200)
           .end(function (err, res) {
-            var employee = res.body;
-            assert(_.isObject(employee));
-            assert.equal(employee.email, 'me@mocha.test');
+            var admin = res.body;
+            assert(_.isObject(admin));
+            assert.equal(admin.email, 'me@mocha.test');
             done(err);
           });
     });
@@ -38,12 +38,12 @@ describe('Employee Controller', function () {
 
     describe('http request', function () {
 
-      it('should be able to create new employee', function (done) {
+      it('should be able to create new admin', function (done) {
 
         request(sails.hooks.http.app)
             .post('/register')
             .send({
-              email: 'new.employee@email.com',
+              email: 'new.admin@email.com',
               password: 'admin1234'
             })
             .expect(200)
@@ -53,12 +53,12 @@ describe('Employee Controller', function () {
 
       });
 
-      it('should return error if employee already exists', function (done) {
+      it('should return error if admin already exists', function (done) {
 
         request(sails.hooks.http.app)
             .post('/register')
             .send({
-              email: 'new.employee@email.com',
+              email: 'new.admin@email.com',
               password: 'admin1234'
             })
             .expect(400)
@@ -72,9 +72,9 @@ describe('Employee Controller', function () {
 
     describe('socket request', function () {
 
-      it('should be able to create new employee', function (done) {
+      it('should be able to create new admin', function (done) {
 
-        io.socket.post('/register', { email: 'new.socketemployee@email.com', password: 'admin1234' }, function (data, jwres) {
+        io.socket.post('/register', { email: 'new.socketadmin@email.com', password: 'admin1234' }, function (data, jwres) {
 
           assert.equal(jwres.statusCode, 200);
           done();
@@ -83,9 +83,9 @@ describe('Employee Controller', function () {
 
       });
 
-      it('should return error if employee already exists', function (done) {
+      it('should return error if admin already exists', function (done) {
 
-        io.socket.post('/register', { email: 'new.socketemployee@email.com', password: 'admin1234' }, function (data, jwres) {
+        io.socket.post('/register', { email: 'new.socketadmin@email.com', password: 'admin1234' }, function (data, jwres) {
 
           assert.equal(jwres.statusCode, 400);
           done();
@@ -102,16 +102,16 @@ describe('Employee Controller', function () {
 
     describe('http request', function () {
 
-      var employeeId;
+      var adminId;
 
-      it('should find employee if they have been authenticated', function (done) {
+      it('should find admin if they have been authenticated', function (done) {
 
         var agent = request.agent(sails.hooks.http.app);
 
         agent
             .post('/auth/local')
             .send({
-              identifier: 'existing.employee@email.com',
+              identifier: 'existing.admin@email.com',
               password: 'admin1234'
             })
             .expect(200, function (err, res) {
@@ -119,10 +119,10 @@ describe('Employee Controller', function () {
               if (err)
                 return done(err);
 
-              employeeId = res.body.id;
+              adminId = res.body.id;
 
               agent
-                  .get('/employee/' + employeeId)
+                  .get('/admin/' + adminId)
                   .expect(200)
                   .end(function (err) {
                     done(err);
@@ -131,7 +131,7 @@ describe('Employee Controller', function () {
 
       });
 
-      it('should not find employee if they have logged out', function (done) {
+      it('should not find admin if they have logged out', function (done) {
 
         var agent = request.agent(sails.hooks.http.app);
 
@@ -143,7 +143,7 @@ describe('Employee Controller', function () {
                 return done(err);
 
               agent
-                  .get('/employee/' + employeeId)
+                  .get('/admin/' + adminId)
                   .expect(403)
                   .end(function (err) {
                     done(err);
@@ -156,17 +156,17 @@ describe('Employee Controller', function () {
 
     describe('socket request', function () {
 
-      var employeeId;
+      var adminId;
 
-      it('should find employee if they have been authenticated', function (done) {
+      it('should find admin if they have been authenticated', function (done) {
 
-        io.socket.post('/auth/local', { identifier: 'existing.employee@email.com', password: 'admin1234' }, function (data, jwres) {
+        io.socket.post('/auth/local', { identifier: 'existing.admin@email.com', password: 'admin1234' }, function (data, jwres) {
 
           assert.equal(jwres.statusCode, 200);
 
-          employeeId = data.id;
+          adminId = data.id;
 
-          io.socket.get('/employee/' + employeeId, function(data, jwres) {
+          io.socket.get('/admin/' + adminId, function(data, jwres) {
 
             assert.equal(jwres.statusCode, 200);
 
@@ -178,13 +178,13 @@ describe('Employee Controller', function () {
 
       });
 
-      it('should not find employee if they have logged out', function (done) {
+      it('should not find admin if they have logged out', function (done) {
 
         io.socket.get('/logout', function (data, jwres) {
 
           assert.equal(jwres.statusCode, 200);
 
-          io.socket.get('/employee/' + employeeId, function(data, jwres) {
+          io.socket.get('/admin/' + adminId, function(data, jwres) {
 
             assert.equal(jwres.statusCode, 403);
 

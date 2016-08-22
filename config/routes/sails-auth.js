@@ -1,5 +1,5 @@
 module.exports.routes = {
-  'post /register': 'EmployeeController.create',
+  'post /register': 'AdminController.create',
   'get /logout': 'AuthController.logout',
 
   'post /auth/local': 'AuthController.callback',

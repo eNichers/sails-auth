@@ -20,7 +20,7 @@ before(function(done) {
     request(sails.hooks.http.app)
       .post('/register')
       .send({
-        email: 'existing.employee@email.com',
+        email: 'existing.admin@email.com',
         password: 'admin1234'
       })
       .end(function(err) {

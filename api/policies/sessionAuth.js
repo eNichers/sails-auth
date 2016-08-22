@@ -4,11 +4,11 @@ var _ = require('lodash');
  * sessionAuth
  *
  * @module      :: Policy
- * @description :: Simple policy to allow any authenticated employee
+ * @description :: Simple policy to allow any authenticated admin
  * @docs        :: http://sailsjs.org/#!documentation/policies
  */
 module.exports = function(req, res, next) {
-  // Employee is allowed, proceed to the next policy, 
+  // Admin is allowed, proceed to the next policy, 
   // or if this is the last policy, the controller
   if (req.session.authenticated) {
     return next();

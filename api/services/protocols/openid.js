@@ -2,10 +2,10 @@
  * OpenID Authentication Protocol
  *
  * OpenID is an open standard for federated authentication. When visiting a
- * website, employees present their OpenID to sign in. The employee then authenticates
+ * website, admins present their OpenID to sign in. The admin then authenticates
  * with their chosen OpenID provider, which issues an assertion to confirm the
- * employee's identity. The website verifies this assertion in order to sign the
- * employee in.
+ * admin's identity. The website verifies this assertion in order to sign the
+ * admin in.
  *
  * For more information on OpenID in Passport.js, check out:
  * http://passportjs.org/guide/openid/

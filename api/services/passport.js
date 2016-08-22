@@ -13,40 +13,40 @@ var _ = require('lodash');
  *   passport.endpoint()
  *   passport.callback()
  *
- * The former sets up an endpoint (/auth/:provider) for redirecting a employee to a
+ * The former sets up an endpoint (/auth/:provider) for redirecting a admin to a
  * third-party provider for authentication, while the latter sets up a callback
  * endpoint (/auth/:provider/callback) for receiving the response from the
  * third-party provider. All you have to do is define in the configuration which
  * third-party providers you'd like to support. It's that easy!
  *
  * Behind the scenes, the service stores all the data it needs within "Pass-
- * ports". These contain all the information required to associate a local employee
+ * ports". These contain all the information required to associate a local admin
  * with a profile from a third-party provider. This even holds true for the good
  * ol' password authentication scheme – the Authentication Service takes care of
  * encrypting passwords and storing them in Passports, allowing you to keep your
- * Employee model free of bloat.
+ * Admin model free of bloat.
  */
 
 // Load authentication protocols
 passport.protocols = require('./protocols');
 
 /**
- * Connect a third-party profile to a local employee
+ * Connect a third-party profile to a local admin
  *
- * This is where most of the magic happens when a employee is authenticating with a
+ * This is where most of the magic happens when a admin is authenticating with a
  * third-party provider. What it does, is the following:
  *
  *   1. Given a provider and an identifier, find a mathcing Passport.
  *   2. From here, the logic branches into two paths.
  *
- *     - A employee is not currently logged in:
- *       1. If a Passport wassn't found, create a new employee as well as a new
- *          Passport that will be assigned to the employee.
- *       2. If a Passport was found, get the employee associated with the passport.
+ *     - A admin is not currently logged in:
+ *       1. If a Passport wassn't found, create a new admin as well as a new
+ *          Passport that will be assigned to the admin.
+ *       2. If a Passport was found, get the admin associated with the passport.
  *
- *     - A employee is currently logged in:
+ *     - A admin is currently logged in:
  *       1. If a Passport wasn't found, create a new Passport and associate it
- *          with the already logged in employee (ie. "Connect")
+ *          with the already logged in admin (ie. "Connect")
  *       2. If a Passport was found, nothing needs to happen.
  *
  * As you can see, this function handles both "authentication" and "authori-
@@ -64,7 +64,7 @@ passport.protocols = require('./protocols');
  * @param {Function} next
  */
 passport.connect = function (req, query, profile, next) {
-  var employee = { };
+  var admin = { };
 
   // Get the authentication provider from the query.
   query.provider = req.param('provider');
@@ -80,23 +80,23 @@ passport.connect = function (req, query, profile, next) {
   }
 
   // If the profile object contains a list of emails, grab the first one and
-  // add it to the employee.
+  // add it to the admin.
   if (profile.hasOwnProperty('emails')) {
-    employee.email = profile.emails[0].value;
+    admin.email = profile.emails[0].value;
   }
-  // If the profile object contains a employeeName, add it to the employee.
-  if (profile.hasOwnProperty('employeeName')) {
-    employee.employeeName = profile.employeeName;
+  // If the profile object contains a adminName, add it to the admin.
+  if (profile.hasOwnProperty('adminName')) {
+    admin.adminName = profile.adminName;
   }
 
-  // If neither an email or a employeeName was available in the profile, we don't
-  // have a way of identifying the employee in the future. Throw an error and let
+  // If neither an email or a adminName was available in the profile, we don't
+  // have a way of identifying the admin in the future. Throw an error and let
   // whoever's next in the line take care of it.
-  if (!employee.employeeName && !employee.email) {
-    return next(new Error('Neither a employeeName nor email was available'));
+  if (!admin.adminName && !admin.email) {
+    return next(new Error('Neither a adminName nor email was available'));
   }
 
-  var Employee = sails.models.employee;
+  var Admin = sails.models.admin;
   var Passport = sails.models.passport;
 
   Passport.findOne({
@@ -107,26 +107,26 @@ passport.connect = function (req, query, profile, next) {
       return next(err);
     }
 
-    if (!req.employee) {
-      // Scenario: A new employee is attempting to sign up using a third-party
+    if (!req.admin) {
+      // Scenario: A new admin is attempting to sign up using a third-party
       //           authentication provider.
-      // Action:   Create a new employee and assign them a passport.
+      // Action:   Create a new admin and assign them a passport.
       if (!passport) {
-        sails.models.employee.create(employee, function (err, employee) {
+        sails.models.admin.create(admin, function (err, admin) {
           if (err) {
             if (err.code === 'E_VALIDATION') {
               if (err.invalidAttributes.email) {
                 req.flash('error', 'Error.Passport.Email.Exists');
               }
               else {
-                req.flash('error', 'Error.Passport.Employee.Exists');
+                req.flash('error', 'Error.Passport.Admin.Exists');
               }
             }
 
             return next(err);
           }
 
-          query.employee = employee.id;
+          query.admin = admin.id;
 
           Passport.create(query, function (err, passport) {
             // If a passport wasn't created, bail out
@@ -134,13 +134,13 @@ passport.connect = function (req, query, profile, next) {
               return next(err);
             }
 
-            next(err, employee);
+            next(err, admin);
           });
         });
       }
-      // Scenario: An existing employee is trying to log in using an already
+      // Scenario: An existing admin is trying to log in using an already
       //           connected passport.
-      // Action:   Get the employee associated with the passport.
+      // Action:   Get the admin associated with the passport.
       else {
         // If the tokens have changed since the last session, update them
         if (query.hasOwnProperty('tokens') && query.tokens !== passport.tokens) {
@@ -153,16 +153,16 @@ passport.connect = function (req, query, profile, next) {
             return next(err);
           }
 
-          // Fetch the employee associated with the Passport
-          sails.models.employee.findOne(passport.employee.id, next);
+          // Fetch the admin associated with the Passport
+          sails.models.admin.findOne(passport.admin.id, next);
         });
       }
     } else {
-      // Scenario: A employee is currently logged in and trying to connect a new
+      // Scenario: A admin is currently logged in and trying to connect a new
       //           passport.
-      // Action:   Create and assign a new passport to the employee.
+      // Action:   Create and assign a new passport to the admin.
       if (!passport) {
-        query.employee = req.employee.id;
+        query.admin = req.admin.id;
 
         Passport.create(query, function (err, passport) {
           // If a passport wasn't created, bail out
@@ -170,13 +170,13 @@ passport.connect = function (req, query, profile, next) {
             return next(err);
           }
 
-          next(err, req.employee);
+          next(err, req.admin);
         });
       }
-      // Scenario: The employee is a nutjob or spammed the back-button.
+      // Scenario: The admin is a nutjob or spammed the back-button.
       // Action:   Simply pass along the already established session.
       else {
-        next(null, req.employee);
+        next(null, req.admin);
       }
     }
   });
@@ -196,7 +196,7 @@ passport.endpoint = function (req, res) {
   var provider = req.param('provider');
   var options = { };
 
-  // If a provider doesn't exist for this endpoint, send the employee back to the
+  // If a provider doesn't exist for this endpoint, send the admin back to the
   // login page
   if (!strategies.hasOwnProperty(provider)) {
     return res.redirect('/login');
@@ -207,8 +207,8 @@ passport.endpoint = function (req, res) {
     options.scope = strategies[provider].scope;
   }
 
-  // Redirect the employee to the provider for authentication. When complete,
-  // the provider will redirect the employee back to the application at
+  // Redirect the admin to the provider for authentication. When complete,
+  // the provider will redirect the admin back to the application at
   //     /auth/:provider/callback
   this.authenticate(provider, options)(req, res, req.next);
 };
@@ -227,28 +227,28 @@ passport.callback = function (req, res, next) {
   var provider = req.param('provider', 'local');
   var action = req.param('action');
 
-  // Passport.js wasn't really built for local employee registration, but it's nice
+  // Passport.js wasn't really built for local admin registration, but it's nice
   // having it tied into everything else.
   if (provider === 'local' && action !== undefined) {
-    if (action === 'register' && !req.employee) {
+    if (action === 'register' && !req.admin) {
       this.protocols.local.register(req, res, next);
     }
-    else if (action === 'connect' && req.employee) {
+    else if (action === 'connect' && req.admin) {
       this.protocols.local.connect(req, res, next);
     }
-    else if (action === 'disconnect' && req.employee) {
+    else if (action === 'disconnect' && req.admin) {
       this.protocols.local.disconnect(req, res, next);
     }    
     else {
       next(new Error('Invalid action'));
     }
   } else {
-    if (action === 'disconnect' && req.employee) {
+    if (action === 'disconnect' && req.admin) {
       this.disconnect(req, res, next) ;
     } else {
-      // The provider will redirect the employee to this URL after approval. Finish
+      // The provider will redirect the admin to this URL after approval. Finish
       // the authentication process by attempting to obtain an access token. If
-      // access was granted, the employee will be logged in. Otherwise, authentication
+      // access was granted, the admin will be logged in. Otherwise, authentication
       // has failed.
       this.authenticate(provider, next)(req, res, req.next);
     }
@@ -259,13 +259,13 @@ passport.callback = function (req, res, next) {
  * Load all strategies defined in the Passport configuration
  *
  * For example, we could add this to our config to use the GitHub strategy
- * with permission to access a employees email address (even if it's marked as
- * private) as well as permission to add and update a employee's Gists:
+ * with permission to access a admins email address (even if it's marked as
+ * private) as well as permission to add and update a admin's Gists:
  *
     github: {
       name: 'GitHub',
       protocol: 'oauth2',
-      scope: [ 'employee', 'gist' ]
+      scope: [ 'admin', 'gist' ]
       options: {
         clientID: 'CLIENT_ID',
         clientSecret: 'CLIENT_SECRET'
@@ -285,8 +285,8 @@ passport.loadStrategies = function () {
     var Strategy;
 
     if (key === 'local') {
-      // Since we need to allow employees to login using both employeeNames as well as
-      // emails, we'll set the employeeName field to something more generic.
+      // Since we need to allow admins to login using both adminNames as well as
+      // emails, we'll set the adminName field to something more generic.
       _.extend(options, { usernameField: 'identifier' });
 
       // Only load the local strategy if it's enabled in the config
@@ -331,36 +331,36 @@ passport.loadStrategies = function () {
 };
 
 /**
- * Disconnect a passport from a employee
+ * Disconnect a passport from a admin
  *
  * @param  {Object} req
  * @param  {Object} res
  */
 passport.disconnect = function (req, res, next) {
-  var employee = req.employee;
+  var admin = req.admin;
   var provider = req.param('provider');
   var Passport = sails.models.passport;
 
   Passport.findOne({
       provider   : provider,
-      employee       : employee.id
+      admin       : admin.id
     }, function (err, passport) {
       if (err) return next(err);
       Passport.destroy(passport.id, function passportDestroyed(error) {
         if (err) return next(err);
-        next(null, employee);
+        next(null, admin);
       });
   });
 };
 
-passport.serializeUser(function (employee, next) {
-  next(null, employee.id);
+passport.serializeUser(function (admin, next) {
+  next(null, admin.id);
 });
 
 passport.deserializeUser(function (id, next) {
-  sails.models.employee.findOne(id)
-    .then(function (employee) {
-      next(null, employee || null);
+  sails.models.admin.findOne(id)
+    .then(function (admin) {
+      next(null, admin || null);
     })
     .catch(function (error) {
       next(error);

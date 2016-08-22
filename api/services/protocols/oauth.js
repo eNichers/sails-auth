@@ -2,9 +2,9 @@
  * OAuth Authentication Protocol
  *
  * OAuth 1.0 is a delegated authentication strategy that involves multiple
- * steps. First, a request token must be obtained. Next, the employee is redirected
+ * steps. First, a request token must be obtained. Next, the admin is redirected
  * to the service provider to authorize access. Finally, after authorization has
- * been granted, the employee is redirected back to the application and the request
+ * been granted, the admin is redirected back to the application and the request
  * token can be exchanged for an access token. The application requesting access,
  * known as a consumer, is identified by a consumer key and consumer secret.
  *
