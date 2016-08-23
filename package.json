@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/tjwebb/sails-auth.git"
+    "url": "git://github.com/eNichers/sails-auth.git"
   },
   "keywords": [
     "sails",
@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/tjwebb/sails-auth/issues"
   },
-  "homepage": "https://github.com/tjwebb/sails-auth",
+  "homepage": "https://github.com/eNichers/sails-auth",
   "dependencies": {
     "bcryptjs": "^2.1",
     "bluebird": "^2.9.32",
