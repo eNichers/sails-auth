@@ -30,7 +30,7 @@ module.exports = function (req, res, next) {
   var passport = sails.services.passport;
 
   // Initialize Passport
-  passport.initialize()(req, res, function () {
+  passport.initialize({userProperty: 'admin'})(req, res, function () {
     // Use the built-in sessions
     passport.session()(req, res, function () {
 
