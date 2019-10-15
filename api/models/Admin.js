@@ -9,31 +9,29 @@ module.exports = {
       type: 'string',
       unique: true,
       index: true,
-      notNull: true
+      custom: (value) => value != null
     },
     email: {
       type: 'email',
-      notNull: true,
+      isEmail: true,
       unique: true,
-      index: true
+      // index: true
     },
     passports: {
       collection: 'Passport',
       via: 'admin'
-    },
-
-    getGravatarUrl: function () {
-      var md5 = crypto.createHash('md5');
-      md5.update(this.email || '');
-      return 'https://gravatar.com/avatar/'+ md5.digest('hex');
-    },
-
-    toJSON: function () {
-      var admin = this.toObject();
-      delete admin.password;
-      admin.gravatarUrl = this.getGravatarUrl();
-      return admin;
     }
+  },
+
+  customToJSON: function() {
+    const admin = _.clone(this)
+    delete admin.password;
+
+    const md5 = crypto.createHash('md5');
+    md5.update(admin.email || '');
+    admin.gravatarUrl = 'https://gravatar.com/avatar/'+ md5.digest('hex');
+
+    return admin;
   },
 
   beforeCreate: function (admin, next) {

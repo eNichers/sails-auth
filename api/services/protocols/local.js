@@ -149,7 +149,7 @@ exports.login = function (req, identifier, password, next) {
     , admin     : admin.id
     }, function (err, passport) {
       if (passport) {
-        passport.validatePassword(password, function (err, res) {
+        Passport.validatePassword(passport, password, function (err, res) {
           if (err) {
             return next(err);
           }

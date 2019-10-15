@@ -66,6 +66,7 @@
     "npm": ">= 2.3"
   },
   "sails": {
-    "isHook": true
+    "isHook": true,
+    "hookName": "auth"
   }
 }
