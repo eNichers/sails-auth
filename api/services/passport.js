@@ -305,7 +305,13 @@ passport.loadStrategies = function () {
 
       Strategy = strategies[key].strategy;
 
-      var baseUrl = sails.getBaseurl();
+      var baseUrl = '';
+      if (sails.config.appUrl && sails.config.appUrl !== null) {
+        baseUrl = sails.config.appUrl;
+      } else {
+        sails.log.warn('Please add "appUrl" configuration value.');
+        baseUrl = sails.getBaseurl();
+      }
 
       switch (protocol) {
         case 'oauth':
